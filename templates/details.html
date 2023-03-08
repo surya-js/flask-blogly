@@ -1,0 +1,52 @@
+{% extends 'base.html'  %}
+{% block title %} {{user.first_name}} {{user.last_name}} Page{% endblock %}
+
+{% block content %}
+
+<img src="{{user.image_url}}" alt="{{user.first_name}}'s image" width="200" height="200">
+
+<div class="user-name">
+<h1>{{user.first_name}} {{user.last_name}}</h1>
+</div>
+
+<div class="user-btn-area">
+
+    <form action="/users/{{user.id}}/edit">
+        <button class="edit-btn"> Edit </button>
+    </form>
+
+    <form action="/users/{{user.id}}/delete">
+        <button class="delete-btn"> Delete </button>
+    </form>
+
+    <h2> Posts </h2>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <section class="messages">
+        {% for msg in messages %}
+        <p> {{msg}} </p> 
+        {% endfor %}
+        </section>
+        <br><br>
+        {% endif %}
+    {% endwith %}
+
+    {% if user.posts %}
+    <ul>
+        {% for post in user.posts %}
+        <li>
+            <a href="/posts/{{ post.id }}" class="links">{{ post.title }}</a>
+            <small>{{ post.friendly_date }}</small>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <form action="/users/{{user.id}}/posts/new">
+        <button class="add-post-btn"> Add Post </button>
+    </form>
+    
+</div>
+
+{% endblock %}

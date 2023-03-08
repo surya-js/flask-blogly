@@ -1,0 +1,98 @@
+
+.contents {
+    max-width: 2000px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    align-content: center;
+}
+
+.home-link {
+    text-decoration: none;
+    background-color: rgb(240, 255, 250);
+    color: rgb(0, 85, 255);
+    font-weight: bold;
+    border-radius: 0.25rem;
+    padding: 7px 10px;
+}
+
+.links {
+    text-decoration: none;
+    color: rgb(0, 119, 255);
+}
+
+.add-user-btn {
+    border-radius: 0.25rem;
+    border: none;
+    height: 30px;
+    background-color:dimgray;
+    color:azure;
+    cursor: pointer;
+}
+
+.create-user-btn{
+    border-radius: 0.25rem;
+    border: none;
+    height: 30px;
+    background-color:rgb(14, 171, 51);
+    color:azure;
+    cursor: pointer;
+}
+
+.edit-btn{
+    border-radius: 0.25rem;
+    border: none;
+    height: 30px;
+    background-color:rgb(21, 143, 205);
+    color:azure;
+    cursor: pointer;
+}
+
+.delete-btn{
+    border-radius: 0.25rem;
+    border: none;
+    height: 30px;
+    background-color:rgb(194, 27, 18);
+    color:azure;
+    cursor: pointer;
+}
+
+.save-edit-btn{
+    border-radius: 0.25rem;
+    border: none;
+    height: 30px;
+    background-color:rgb(14, 171, 51);
+    color:azure;
+    cursor: pointer;
+}
+
+.cancel-link{
+    text-decoration: none;
+    background-color: rgb(240, 251, 255);
+    color: rgb(0, 153, 255);
+    border-radius: 0.25rem;
+    padding: 7px 10px;
+}
+
+.add-post-btn{
+    border-radius: 0.25rem;
+    border: none;
+    height: 30px;
+    background-color:rgb(21, 143, 205);
+    color:azure;
+    cursor: pointer;
+}
+
+.create-post-btn{
+    border-radius: 0.25rem;
+    border: none;
+    height: 30px;
+    background-color:rgb(14, 171, 51);
+    color:azure;
+    cursor: pointer;
+}
+
+.messages{
+    color: rgb(42, 147, 212);
+    font-weight: bolder;
+}
