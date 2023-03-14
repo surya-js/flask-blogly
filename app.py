@@ -2,7 +2,7 @@
 
 from flask import Flask, request, render_template,  redirect, flash
 from flask_debugtoolbar import DebugToolbarExtension
-from models import db, connect_db, User, DEFAULT_IMAGE_URL, Post
+from models import db, connect_db, User, DEFAULT_IMAGE_URL, Post,Tag,PostTag
 
 app = Flask(__name__)
 
@@ -92,7 +92,7 @@ def edit_user(user_id):
 
 @app.route('/users/<int:user_id>/delete')
 def delete_user(user_id):
-    """Delete the User"""
+    """Deletes the specific User"""
     
     user = User.query.get_or_404(user_id)
     db.session.delete(user)
@@ -107,7 +107,9 @@ def add_post_form(user_id):
     """Shows add post form for a specific user"""
 
     user = User.query.get_or_404(user_id)
-    return render_template('post-add.html', user = user)
+    tags = Tag.query.all()
+
+    return render_template('post-add.html', user=user, tags=tags)
 
 @app.route('/users/<int:user_id>/posts/new', methods=["POST"])
 def add_post(user_id):
@@ -116,10 +118,15 @@ def add_post(user_id):
     
     title = request.form['title']
     content = request.form['content']
+    tags_id = request.form.getlist('tags')
 
     user = User.query.get_or_404(user_id)
 
     new_post = Post(title=title, content=content, user_id=user.id)
+
+    for tag_id in tags_id:
+        tag = Tag.query.get(tag_id)
+        new_post.tags.append(tag)
 
     db.session.add(new_post)
     db.session.commit()
@@ -133,6 +140,7 @@ def show_post(post_id):
     """Shows a specific post"""
 
     post = Post.query.get_or_404(post_id)
+    # tags = post.tags # No need to pass it from here. Can get the tags directly in Jinja Template
     return render_template('post-details.html', post=post)
 
 @app.route('/posts/<int:post_id>/edit')
@@ -140,16 +148,35 @@ def edit_post_form(post_id):
     """Shows form to edit a specific post"""
 
     post = Post.query.get_or_404(post_id)
-    return render_template('post-edit.html', post=post)
+    tags = Tag.query.all()
+
+    return render_template('post-edit.html', post=post, tags=tags)
 
 @app.route('/posts/<int:post_id>/edit', methods=["POST"])
-def update_post(post_id):
+def edit_post(post_id):
     """Handle form submission for updating an existing post"""
 
     post = Post.query.get_or_404(post_id)
 
     post.title = request.form['title']
     post.content = request.form['content']
+
+    tags_id = request.form.getlist('tags') #print({tags_id}) # ['1', '3'] # getlist returns a list
+    tags_id = [int(id) for id in tags_id] #converting the id to int and saving it to a list, since the incoming id from the form is in string datatype
+
+    # since post.tags have previously added tags we have to remove it separately if 
+    # the user have removed any tags while editing the post
+    # for tag in post.tags:
+    #     if tag.id not in tags_id:
+    #         tag = Tag.query.get(tag.id)
+    #         post.tags.remove(tag)
+
+    # for tag_id in tags_id:
+    #     tag = Tag.query.get(int(tag_id))
+    #     post.tags.append(tag)
+    # The above snippet is not working properly. If we uncheck two tags, it removes only the first unchecked tag
+
+    post.tags = Tag.query.filter(Tag.id.in_(tags_id)).all() # updating post.tags with new edited tags
 
     db.session.add(post)
     db.session.commit()
@@ -160,7 +187,7 @@ def update_post(post_id):
 
 @app.route('/posts/<int:post_id>/delete')
 def delete_post(post_id):
-    """Delete the specific post"""
+    """Deletes the specific post"""
 
     post = Post.query.get_or_404(post_id)
 
@@ -169,4 +196,72 @@ def delete_post(post_id):
 
     flash(f"Post Deleted!")
     return redirect(f'/users/{post.user_id}')
+
+# Tag routes
+
+@app.route('/tags')
+def list_tags():
+    """ Lists all tags."""
+
+    tags = Tag.query.all()
+    return render_template('tags-list.html', tags=tags)
+
+@app.route('/tags/new')
+def add_tag_form():
+    """Shows add tag form"""
+
+    return render_template('tag-add.html')
+
+@app.route('/tags/new', methods=["POST"])
+def add_tag():
+    """Handles the add tag form, adds tag and 
+    redirects to the tags list"""
+
+    name = request.form['name']
+
+    new_tag = Tag(name=name)
+
+    db.session.add(new_tag)
+    db.session.commit()
+
+    return redirect('/tags')
+
+@app.route('/tags/<int:tag_id>')
+def show_tag(tag_id):
+    """ Shows detail about a specific tag"""
+
+    tag = Tag.query.get_or_404(tag_id)
+    return render_template('tag-details.html', tag=tag)
+
+@app.route('/tags/<int:tag_id>/edit')
+def edit_tag_form(tag_id):
+    """ Shows a form to edit a specific tag"""
+
+    tag = tag = Tag.query.get_or_404(tag_id)
+    return render_template('tag-edit.html', tag=tag)
+
+@app.route('/tags/<int:tag_id>/edit', methods=["POST"])
+def edit_tag(tag_id):
+    """Handles the edit tag form, edits tag and 
+    redirects to the tags list"""
+
+    tag = Tag.query.get_or_404(tag_id)
+    tag.name = request.form['name']
+
+    db.session.add(tag)
+    db.session.commit()
+
+    return redirect(f'/tags/{tag_id}')
+
+@app.route('/tags/<int:tag_id>/delete')
+def delete_tag(tag_id):
+    """ Deletes the specific tag"""
+
+    tag = Tag.query.get_or_404(tag_id)
+
+    db.session.delete(tag)
+    db.session.commit()
+
+    return redirect('/tags')
+
 

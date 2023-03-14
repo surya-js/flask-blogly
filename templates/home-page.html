@@ -17,6 +17,16 @@
     </small>
 </p>
 
+{% if post.tags %}
+<p> 
+    <b>Tags: </b>
+    {% for tag in post.tags %}
+    <a href="/tags/{{ tag.id }}" class="tag-link"><small><i>{{tag.name}}</i></small></a>
+    {% endfor %}
+</p>
+{% endif %}
+
+
 {% endfor %}
 
 {% endblock %}

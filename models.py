@@ -15,7 +15,9 @@ def connect_db(app):
     db.init_app(app)
 
 class User(db.Model):
-    """User Model"""
+    """User Model
+       A User can have many Posts 1-M"""
+
 
     __tablename__ = 'users'
 
@@ -35,10 +37,10 @@ class User(db.Model):
 
     posts = db.relationship('Post', backref='user', cascade='all, delete-orphan')
 
+    #the Cascade property should be mentioned on the 1 end of a 1-M relationship.
     #cascade='all, delete' - deletes posts when their user is deleted
     # cascade='all, delete-orphan' - also deletes any posts that were "removed" from the 
     # user, even if the user is not deleted
-    
                         
     def __repr__(self):
         u = self
@@ -57,7 +59,9 @@ class User(db.Model):
 ## Part - 2: Adding Posts
 
 class Post(db.Model):
-    """Post Model"""
+    """Post Model
+       A Post can have one User
+       A Post can have many Tags"""
 
     __tablename__ = 'posts'
 
@@ -78,15 +82,21 @@ class Post(db.Model):
     user_id = db.Column(db.Integer,
                         db.ForeignKey('users.id'),
                         nullable=False)
-
+    # [
     # user = db.relationship('Users', backref='posts', cascade="all, delete-orphan")
     # This won't work for delete cascade. i.e When a user is deleted, also delete their posts
-    #  Have to define the relationship in the User or it will work reverse
+    # Have to define the relationship in the User or it will work reverse. i.e when a post is deleted it's user will be deleted
 
     # or You can give as follows
     # user = relationship('Users', backref=backref("posts", cascade="all, delete-orphan"))
 
     # Instead we can simply define the relationship in the User Model
+    # ]
+
+    # direct navigation: post -> tags & back through posts_tags
+    tags = db.relationship('Tag',
+                               secondary='posts_tags',
+                               backref='posts')
     
     def __repr__(self):
         p = self
@@ -106,3 +116,39 @@ class Post(db.Model):
         # %-I - Hour (12-hour clock) as a decimal number. - 9
         # %M - Minute as a zero-padded decimal number.  - 30
         # %p - Locale’s AM or PM.
+
+## Part - 3: Adding Tags
+
+class Tag(db.Model):
+    """ Tag Model: 
+        A Tag can have many Posts"""
+
+    __tablename__ = 'tags'
+
+    id = db.Column(db.Integer,
+                   primary_key=True,
+                   autoincrement=True)
+    
+    name = db.Column(db.Text,
+                     unique=True,
+                      nullable=False)
+    
+    
+class PostTag(db.Model):
+    """ PostTag Model: Mapping of a post to a tag.
+        Have a middle table between posts and tags
+        A post can have many tags and a tag can have many posts. So, this is a M-M relationship.
+        And we are creating a PostTag Model to establish this M-M relationship"""
+
+    __tablename__ = 'posts_tags'
+
+    post_id = db.Column(db.Integer,
+                        db.ForeignKey('posts.id'),
+                        primary_key=True)
+                    
+    tag_id = db.Column(db.Integer,
+                        db.ForeignKey('tags.id'),
+                        primary_key=True)
+
+    # “This is a composite primary key” — a primary key made of more than one field.
+    # Here the post_id can repeat and the tag_id can repeat But the same (post_id, tag_id) combination should not repeat.

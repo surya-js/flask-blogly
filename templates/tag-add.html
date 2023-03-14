@@ -1,0 +1,17 @@
+{% extends 'base.html'  %}
+{% block title %} Add New Tag Form {% endblock %}
+
+{% block content %}
+
+<h1> Create a Tag</h1>
+
+<form action="/tags/new" method="POST">
+    <p>
+        <label for="name"> Name </label>
+        <input type="text" name="name" id="name" placeholder="Enter a name for the tag">
+    </p>
+    <a href="/tags" class="cancel-link"> Cancel </a>
+    <button type="submit" class="create-btn"> Add </button>
+</form>
+
+{% endblock %}

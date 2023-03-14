@@ -15,8 +15,16 @@
         <textarea name="content" id="content"></textarea>
     </p>
 
+    {% if tags %}
+        {% for tag in tags %}
+            <input type="checkbox" name="tags" id="{{tag.id}}" value="{{tag.id}}">
+            <label for="{{tag.id}}">{{tag.name}}</label><br>
+        {% endfor %}
+    {% endif %}
+
+    <br>
     <a href="/users/{{user.id}}" class="cancel-link"> Cancel </a>
-    <button type="submit" class="create-post-btn"> Create </button>
+    <button type="submit" class="create-btn"> Create </button>
 </form>
 
 {% endblock %}
